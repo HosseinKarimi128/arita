@@ -1,0 +1,4 @@
+What is the genre of this photo?
+your responce templeate should be as below:
+{ genre_1_name: x_1% , genre_2_name: x_2%, ...}
+
