@@ -67,12 +67,16 @@ class AnalyzeMedia(Resource):
             logging.info(f'Uploading File {file.filename}')
             _file = genai.upload_file(file.filename)
             file_uri =  _file.uri
-            mime_type = file.mime_type
+            mime_type = _file.mime_type
             logging.info('Uploading file completed!')
 
             # Replace 'AIModel' with your actual media analysis function
-            genre = analyze_media(file_uri, mime_type)  # Replace with your implementation
-
+            try:
+                genre = analyze_media(file_uri, mime_type)  # Replace with your implementation
+                logging.info(' Genre has been identified sucessfully')
+            except Exception as e:
+                logging.error(e)  
+            
             return jsonify({'genre': genre}), 200
         except Exception as e:
             logging.error(f'Error during analysis: {e}')
@@ -86,6 +90,7 @@ def analyze_media(file_uri, mime_type):
     genai.configure(api_key='AIzaSyD7lveG7AUMh73mP4O53QKMI4ba8Ozk2Qc')
     ai_model = AIModel()
     genre = ai_model.analyze_media(file_uri, mime_type)
+    return genre
     
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

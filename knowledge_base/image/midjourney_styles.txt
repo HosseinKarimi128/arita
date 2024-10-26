@@ -1,0 +1,11 @@
+
+    STYLE: Cyberpunk
+    Description: Futuristic dystopian aesthetic
+    Parameters: --ar 16:9 --stylize 750 --v 5.2
+    Example Prompts: cyberpunk night market, neon signs reflecting in puddles
+    
+    STYLE: Fantasy
+    Description: Magical and mythical scenes
+    Parameters: --ar 1:1 --stylize 1000 --v 5.2
+    Example Prompts: enchanted forest, magical creatures, glowing particles
+    

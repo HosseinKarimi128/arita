@@ -1,0 +1,23 @@
+TECHNIQUE: Slow Motion
+Parameters:
+- Frame Rate: 60-120fps
+- Speed Reduction: 0.25x - 0.5x
+Best Used For:
+- Emotional moments
+- Action sequences
+- Natural phenomena
+Example Prompts:
+- "slow motion sequence of falling autumn leaves, golden hour lighting, cinematic quality"
+- "dramatic slow-motion walk, rain falling, moody atmosphere, anamorphic lens"
+
+TECHNIQUE: Hyperlapse
+Parameters:
+- Frame Interval: 0.5-2 seconds
+- Camera Movement: Smooth tracking
+Best Used For:
+- Urban scenes
+- Nature transformations
+- Construction processes
+Example Prompts:
+- "hyperlapse through busy city streets, day to night transition, smooth camera movement"
+- "architectural hyperlapse, modern buildings, dynamic perspective shifts"

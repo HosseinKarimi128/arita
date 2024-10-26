@@ -1,0 +1,25 @@
+STYLE: Hyperrealistic Photography
+Settings:
+- Steps: 50
+- CFG Scale: 7.5
+- Sampler: DPM++ 2M Karras
+Key Techniques:
+- Photographic lighting terms
+- Camera specifications
+- Environmental details
+Example Prompts:
+- "ultra detailed photograph, Canon EOS R5, f/1.8, golden hour lighting, 8k uhd, photorealistic, masterful composition"
+- "hyperrealistic portrait, natural lighting, subtle skin texture, soft bokeh, shot on Hasselblad"
+
+STYLE: Oil Painting
+Settings:
+- Steps: 40
+- CFG Scale: 8.0
+- Sampler: Euler a
+Key Techniques:
+- Brush stroke descriptions
+- Canvas texture
+- Color palette references
+Example Prompts:
+- "oil painting on canvas, impasto technique, visible brushstrokes, rich colors, baroque lighting, traditional art"
+- "classical oil painting style, textured canvas, muted color palette, painted in the style of Rembrandt"

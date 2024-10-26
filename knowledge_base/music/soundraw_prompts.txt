@@ -1,0 +1,27 @@
+MOOD: Epic Orchestral
+Elements:
+- Full orchestra
+- Percussion emphasis
+- Rising tension
+- Brass swells
+Structure:
+- Build-up section
+- Climactic peak
+- Dramatic ending
+Example Prompts:
+- "epic orchestral track with massive drums, brass section, building intensity, cinematic climax"
+- "heroic theme with full orchestra, powerful percussion, emotional strings, grand finale"
+
+MOOD: Peaceful Nature
+Elements:
+- Soft instruments
+- Nature sounds
+- Gentle progression
+- Minimal percussion
+Structure:
+- Ambient intro
+- Subtle melody
+- Natural sound design
+Example Prompts:
+- "peaceful acoustic track with birdsong, gentle guitar, flowing water sounds, soft piano"
+- "calming nature ambience, wooden flute, organic percussion, forest atmosphere"
