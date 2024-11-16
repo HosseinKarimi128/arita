@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  chromadb:
+    image: chromadb:latest
+    container_name: chroma-server
+    ports:
+      - "8324:8324"
+    volumes:
+      - ./database:/app/chroma
+    restart: unless-stopped
+
