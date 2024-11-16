@@ -13,6 +13,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain.prompts import PromptTemplate
 from typing import Optional, List
+from chroma_client import chromaClient
 
 class AIArtistBot:
     def __init__(self, openai_api_key: str, knowledge_dir: str):
@@ -24,6 +25,7 @@ class AIArtistBot:
             knowledge_dir: Directory containing knowledge base documents
         """
         self.llm = ChatOpenAI(model="gpt-3.5-turbo",api_key = openai_api_key)
+        self.chroma_client = chromaClient("http://0.0.0.0:8324")
         
         # Initialize embeddings
         logging.info(' loading embeddings')
@@ -33,22 +35,10 @@ class AIArtistBot:
         logging.info(' loading parser')
         self.parser = StrOutputParser()
         
-        # Load and process knowledge base
-        logging.info(' creating vector store')
-        self.vector_store = self._setup_knowledge_base(knowledge_dir)
-        
         # Initialize prompt templates
         logging.info(' setting up prompts')
         self._setup_prompts()
-        
-    def _setup_knowledge_base(self, knowledge_dir: str):
-        """Set up the RAG knowledge base"""
 
-        db = Chroma(persist_directory=knowledge_dir,
-                    embedding_function=self.embeddings)
-
-        # Create vector store
-        return db
     
     def _setup_prompts(self):
         """Set up prompt templates for different generation tasks"""
@@ -93,11 +83,12 @@ class AIArtistBot:
             List of generated prompts
         """
         # Retrieve relevant context
-        retriever = self.vector_store.as_retriever(
-            search_kwargs={"k": 3}
+        docs = self.chroma_client.retrieve(
+            query=user_request,
+            k=3,
+            # maximum_distance=0.4
         )
-        docs = retriever.invoke(user_request)
-        context = "\n".join([doc.page_content for doc in docs])
+        context = "No context available." if docs is None else "\n".join([doc[0]["page_content"] for doc in docs])
         
         # Create chain
         chain = self.base_prompt | self.llm | self.parser
