@@ -22,11 +22,14 @@ def query_rag(query_text: str, k: int, maximum_distance: float, metadata: dict):
 
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=EMBEDDINGS)
     
-    results = db.similarity_search_with_score(query=query_text,
-                                              filter=metadata,
-                                              k=k
-                                              )
-    
+    if metadata is None:
+        results = db.similarity_search_with_score(query=query_text,k=k)
+    else:
+        results = db.similarity_search_with_score(query=query_text,
+                                                filter=metadata,
+                                                k=k
+                                                )
+        
     new_results = [i for i in results if i[1] < maximum_distance] 
     
     if len(new_results) == 0:
@@ -64,7 +67,7 @@ class InsertRequestText(BaseModel):
 
 class RetrieveRequest(BaseModel):
     query: str                                   # The input query
-    metadata: dict                               # For filtering 
+    metadata: Optional[dict] = None              # For filtering 
     k: Optional[int] = 1                         # The number of retrieved results
     maximum_distance: Optional[float] = 0.4      # The maximum similarity distance
 
