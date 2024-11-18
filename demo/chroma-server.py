@@ -40,6 +40,24 @@ def authenticate(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme
     return credentials
 
 
+def format_metadata(metadata: dict):
+
+    # Mapping of input keys to desired keys in the output
+    key_mapping = {
+        "tools": "tools",
+        "type": "type",
+        "kw": "kw"
+    }
+    
+    # Build the `$and` list
+    conditions = [
+        {key_mapping[key]: {"$eq": value}}
+        for key, value in metadata.items() if key in key_mapping
+    ]
+    
+    return {"$and": conditions} if conditions else {}
+
+
 
 def query_rag(query_text: str, k: int, maximum_distance: float, metadata: dict):
 
@@ -47,9 +65,15 @@ def query_rag(query_text: str, k: int, maximum_distance: float, metadata: dict):
     
     if metadata is None:
         results = db.similarity_search_with_score(query=query_text,k=k)
-    else:
+    elif len(metadata) == 1:
         results = db.similarity_search_with_score(query=query_text,
                                                 filter=metadata,
+                                                k=k
+                                                )
+    else:
+        filters = format_metadata(metadata)   # since Chroma has issues with multiple values for filter 
+        results = db.similarity_search_with_score(query=query_text,
+                                                filter=filters,
                                                 k=k
                                                 )
         
@@ -74,7 +98,6 @@ def save_to_chroma_texts(chunks: list[str], metadatas: list[dict]):
             embedding=EMBEDDINGS,
             ids=ids,
             persist_directory=CHROMA_PATH,
-            # client_settings=Settings(chroma_api_impl='http')
         )
         return f"Saved {len(chunks)} chunks to {CHROMA_PATH}."
     

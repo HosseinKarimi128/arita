@@ -56,6 +56,9 @@ class MessageRequest(BaseModel):
     url: Optional[str] = None              # The raw URL of the attached file
     history: list[dict]                    # The history of the chat
 
+class InsertRequestText(BaseModel):
+    fact:  str                            # Contains the feedback
+    metadata: Optional[dict] = None       # Metadata for each record in DB
 
 
 def update_url(url: str):
@@ -197,7 +200,7 @@ def describe_media(request: MessageRequest, formatted_history):
     
 
 
-@app.post("/receive")
+@app.post("/receive-message")
 async def receive_message(request: MessageRequest):
     if not request.content:
         raise HTTPException(status_code=400, detail="User message cannot be empty")
@@ -222,6 +225,20 @@ async def receive_message(request: MessageRequest):
     formatted_history = format_history_to_json(updated_history)
 
     return formatted_history
+
+
+
+@app.post("/receive-feedback")
+async def receive_feedback(request: InsertRequestText):
+
+    ## TODO later: Feedback may not be informative, so adding logic of data extraction
+
+    results = chatbot.get_context_with_score(request.fact, request.metadata, 0.2)
+    
+    if results is None:
+        return chatbot.insert_feedback(request.fact, request.metadata)
+    else:
+        return {"The feedback already exists in the knowledge base"}
 
 
 

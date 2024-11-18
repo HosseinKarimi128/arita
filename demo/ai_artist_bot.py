@@ -6,13 +6,12 @@ fhandler.setFormatter(formatter)
 logger.addHandler(fhandler)
 logger.setLevel(logging.DEBUG)
 
-from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import AIMessage, HumanMessage
 from langchain.prompts import PromptTemplate
-from typing import Optional, List
+from fastapi import Depends, HTTPException
+from typing import List
 from chroma_client import chromaClient
 
 class AIArtistBot:
@@ -59,9 +58,28 @@ class AIArtistBot:
             2. Uses appropriate tool-specific syntax and parameters
             3. Maintains consistency with the user's request
             4. Includes specific technical details (resolution, aspect ratio, etc.) when relevant
+            5. If you don't know about the subject, just say so.
             
             Generated Prompt:"""
         )
+
+    def get_context(self, 
+                    user_request: str, 
+                    k: int, 
+                    maximum_distance: float,
+                    metadata: dict=None):
+
+        # Retrieve relevant context
+        docs = self.chroma_client.retrieve(
+            query=user_request,
+            metadata=metadata,
+            k=k,
+            maximum_distance=maximum_distance
+        )
+        context = "No context available." if docs is None else "\n".join([doc[0]["page_content"] for doc in docs])
+
+        return context
+        
     
     def generate_prompt(
         self,
@@ -69,6 +87,9 @@ class AIArtistBot:
         chat_history: list,
         task_type: str = "image",  # image, video, or music
         num_results: int = 1,
+        k: int = 3, 
+        maximum_distance: float = 0.4,
+        metadata: dict = None
     ) -> List[str]:
         """
         Generate prompts based on user request and task type
@@ -82,14 +103,8 @@ class AIArtistBot:
         Returns:
             List of generated prompts
         """
-        # Retrieve relevant context
-        docs = self.chroma_client.retrieve(
-            query=user_request,
-            k=3,
-            # maximum_distance=0.4
-        )
-        context = "No context available." if docs is None else "\n".join([doc[0]["page_content"] for doc in docs])
-        
+        context = self.get_context(user_request, k, maximum_distance, metadata)
+
         # Create chain
         chain = self.base_prompt | self.llm | self.parser
         
@@ -104,3 +119,29 @@ class AIArtistBot:
             prompts.append(response)
             
         return prompts
+
+
+    def get_context_with_score(self, 
+                    user_request: str,
+                    metadata: dict=None,
+                    maximum_distance: float=0.3):
+
+        # Retrieve relevant context
+        docs = self.chroma_client.retrieve(
+            query=user_request,
+            metadata=metadata,
+            k=4,
+            maximum_distance=maximum_distance
+        )
+        context = [doc[0] for doc in docs] if docs is not None else None
+
+        return context
+    
+
+    def insert_feedback(self, fact: str, metadata: dict):
+
+        try:
+            self.chroma_client.insert_single(fact, metadata)
+            return {"feedback successfully inserted."}
+        except Exception:
+            raise HTTPException(status_code=500, detail=Exception)

@@ -71,6 +71,38 @@
 			"response": []
 		},
 		{
+			"name": "chroma retrieve (specific query)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": \"star wars\",\n    \"k\" : 2,\n    \"minimum_score\" : 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8324/retrieve",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8324",
+					"path": [
+						"retrieve"
+					]
+				},
+				"description": "inputs a query, and number of to be retrieved results, and minimum similarity score."
+			},
+			"response": []
+		},
+		{
 			"name": "chat with file",
 			"request": {
 				"method": "POST",
@@ -102,7 +134,132 @@
 			"response": []
 		},
 		{
+			"name": "chat with file Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8585/receive",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8585",
+					"path": [
+						"receive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "chat wthout file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8585/receive",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8585",
+					"path": [
+						"receive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "chroma insert-context (specific sample)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"facts\":\n        [\n         \"A world in which time is the currency. The government seeks to grasp your time\",\n         \"A bunch of galactic battles between the empire and rebels. Lightsabers and jet fights everywhere\"\n        ],\n    \"metadatas\":\n        [\n            {\"tools\": \"something\", \"type\": \"image\", \"kw\": \"random\"},\n            {\"tools\": \"something else\", \"type\": \"music\", \"kw\": \"is this a keyword?\"}\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8324/insert-texts",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8324",
+					"path": [
+						"insert-texts"
+					]
+				},
+				"description": "Inserts context inside chromaDB. The input must be a list of strings."
+			},
+			"response": []
+		},
+		{
+			"name": "chat wthout file (specific query)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8585/receive",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8585",
+					"path": [
+						"receive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "insert feedback",
 			"request": {
 				"method": "POST",
 				"header": [],

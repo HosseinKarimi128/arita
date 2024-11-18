@@ -1,10 +1,20 @@
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+VALID_TOKEN = os.getenv("CHROMA_ACCESS_TOKEN")
 
 class chromaClient:
 
     def __init__(self, url):
 
         self.chroma_url = url
+        self.headers = {
+            "Authorization": f"Bearer {VALID_TOKEN}",
+            "Content-Type": "application/json"
+        }
 
     def insert_batch(self, facts: list[str], metadatas: list[dict]):
 
@@ -12,7 +22,8 @@ class chromaClient:
             "facts": facts,
             "metadatas": metadatas
         }
-        response = requests.post(f"{self.chroma_url}/insert-texts", json=payload)
+
+        response = requests.post(f"{self.chroma_url}/insert-texts", json=payload, headers=self.headers)
 
         if response.status_code == 200:
             return response
@@ -26,7 +37,7 @@ class chromaClient:
             "facts": [facts],
             "metadatas": [metadatas]
         }
-        response = requests.post(f"{self.chroma_url}/insert-texts", json=payload)
+        response = requests.post(f"{self.chroma_url}/insert-texts", json=payload, headers=self.headers)
 
         if response.status_code == 200:
             return response
@@ -51,7 +62,7 @@ class chromaClient:
                 "k" : k,
                 "maximum_distance" : maximum_distance
             }
-        response = requests.post(f"{self.chroma_url}/retrieve", json=payload)
+        response = requests.post(f"{self.chroma_url}/retrieve", json=payload, headers=self.headers)
 
         if response.status_code == 200:
             return response.json()
