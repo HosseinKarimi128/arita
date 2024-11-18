@@ -5,16 +5,39 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from typing import Optional
 from uuid import uuid4
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends, HTTPException, status
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 CHROMA_PATH = "./chroma"
-EMBEDDINGS = OpenAIEmbeddings(api_key="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")
+OPENAI_TOKEN = os.getenv("OPENAI_API_KEY")
+VALID_TOKEN = os.getenv("CHROMA_ACCESS_TOKEN")
+EMBEDDINGS = OpenAIEmbeddings(api_key=OPENAI_TOKEN)
+
 
 app = FastAPI(
   title="Chroma Server",
   version="1.0",
   description="""A simple API server serving queries on a Chroma vector store.""",
 )
+auth_scheme = HTTPBearer()
+
+
+
+def authenticate(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)):
+    """
+    Authentication dependency that validates the provided token.
+    """
+    if credentials.credentials != VALID_TOKEN:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return credentials
 
 
 
@@ -74,7 +97,7 @@ class RetrieveRequest(BaseModel):
 
 
 @app.post("/insert-texts")
-async def receive_message(request: InsertRequestText):
+async def insert(request: InsertRequestText, auth: HTTPAuthorizationCredentials = Depends(authenticate)):
     if not request.facts:
         raise HTTPException(status_code=400, detail="Facts cannot be empty")
     
@@ -84,7 +107,7 @@ async def receive_message(request: InsertRequestText):
 
 
 @app.post("/retrieve")
-async def receive_message(request: RetrieveRequest):
+async def retrieve(request: RetrieveRequest, auth: HTTPAuthorizationCredentials = Depends(authenticate)):
     if not request.query:
         raise HTTPException(status_code=400, detail="query cannot be empty")
     if request.k < 1 or type(request.k) != int:

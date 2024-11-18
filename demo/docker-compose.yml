@@ -1,12 +1,15 @@
-version: "3"
-
 services:
   chromadb:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: chromadb:latest
     container_name: chroma-server
     ports:
       - "8324:8324"
     volumes:
       - ./database:/app/chroma
+    env_file:
+      - .env
     restart: unless-stopped
 

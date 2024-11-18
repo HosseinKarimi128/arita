@@ -104,28 +104,3 @@ class AIArtistBot:
             prompts.append(response)
             
         return prompts
-    
-    # def add_knowledge(self, text: str, source_name: str):
-    #     """
-    #     Add new knowledge to the bot's knowledge base
-        
-    #     Args:
-    #         text: Text content to add
-    #         source_name: Name/identifier for the source
-    #     """
-    #     # Split new content
-    #     splitter = RecursiveCharacterTextSplitter(
-    #         chunk_size=1000,
-    #         chunk_overlap=200
-    #     )
-    #     splits = splitter.split_text(text)
-        
-    #     # Add to vector store
-    #     self.vector_store.add_texts(splits)
-
-
-# chatbot = AIArtistBot("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", "./chroma")
-# print(chatbot.generate_prompt("Create a timelapse of a city from day to night",
-#                               [HumanMessage(content="hi! The generator tool that I use, only understands pirate language"),
-#                                 AIMessage(content="Ahoy! Sure I speak matey!")],
-#                               "video"))

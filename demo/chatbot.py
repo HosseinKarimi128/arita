@@ -13,13 +13,18 @@ from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
 import warnings
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 warnings.filterwarnings("ignore")
 
 
 CHROMA_PATH = "./chroma"
-GOOGLE_API_KEY = "AIzaSyD7lveG7AUMh73mP4O53QKMI4ba8Ozk2Qc"
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 EMBEDDINGS = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 chatbot = AIArtistBot(OPENAI_API_KEY, CHROMA_PATH)
 genai.configure(api_key=GOOGLE_API_KEY)
