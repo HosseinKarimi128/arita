@@ -1,7 +1,6 @@
 from ai_artist_bot import AIArtistBot
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
-from langchain_openai import ChatOpenAI
 from fastapi import FastAPI, HTTPException
 from typing import Optional
 from pydantic import BaseModel
@@ -57,8 +56,8 @@ class MessageRequest(BaseModel):
     history: list[dict]                    # The history of the chat
 
 class InsertRequestText(BaseModel):
-    fact:  str                            # Contains the feedback
-    metadata: Optional[dict] = None       # Metadata for each record in DB
+    fact:  str                             # Contains the feedback
+    metadata: Optional[dict] = None        # Metadata for each record in DB
 
 
 def update_url(url: str):

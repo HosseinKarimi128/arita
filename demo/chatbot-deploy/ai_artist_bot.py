@@ -10,9 +10,15 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from typing import List
 from chroma_client import chromaClient
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+CHROMA_URL = os.getenv("CHROMA_URL")
 
 class AIArtistBot:
     def __init__(self, openai_api_key: str, knowledge_dir: str):
@@ -24,7 +30,7 @@ class AIArtistBot:
             knowledge_dir: Directory containing knowledge base documents
         """
         self.llm = ChatOpenAI(model="gpt-3.5-turbo",api_key = openai_api_key)
-        self.chroma_client = chromaClient("http://0.0.0.0:8324")
+        self.chroma_client = chromaClient(CHROMA_URL)
         
         # Initialize embeddings
         logging.info(' loading embeddings')

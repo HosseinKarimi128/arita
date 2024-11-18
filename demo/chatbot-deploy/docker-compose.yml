@@ -1,22 +1,22 @@
 services:
-  chromadb:
+  chatbot:
     build:
       context: .
       dockerfile: Dockerfile
-    image: chromadb:latest
-    container_name: chroma-server
+    image: arita-chatbot:latest
+    container_name: arita-demo
     ports:
-      - "8324:8324"
+      - "8585:8585"
     volumes:
-      - ./database:/app/chroma
+      - ./database:/app/temp_user_files
     env_file:
       - .env
     restart: unless-stopped
     extra_hosts:
       - host.docker.internal:host-gateway
     networks:
-      - shared-network
+      - demo_shared-network
 
 networks:
-  shared-network:
-    driver: bridge
+  demo_shared-network:
+    external: true

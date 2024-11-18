@@ -1,5 +1,4 @@
-# Use the official Python and chromadb image as a base
-FROM python:3.9-slim
+# Use the official chromadb image as a base
 FROM chromadb:latest
 
 # Set the working directory in the container
