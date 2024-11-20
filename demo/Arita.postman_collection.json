@@ -9,11 +9,21 @@
 		{
 			"name": "chroma insert-context",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "yttk7ypL9RIYz9zCxV0eR9KQVST3Wo2zKgUz2g",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"facts\":\n        [\n         \"A world in which time is the currency. The government seeks to grasp your time\",\n         \"A bunch of galactic battles between the empire and rebels. Lightsabers and jet fights everywhere\"\n        ],\n    \"metadatas\":\n        [\n            {\"tools\": \"something\", \"type\": \"image\", \"kw\": \"random\"},\n            {\"tools\": \"something else\", \"type\": \"music\", \"kw\": \"is this a keyword?\"}\n        ]\n}",
+					"raw": "{\n    \"facts\":\n        [\n         \"A world in which time is the currency. The government seeks to grasp your time.\",\n         \"A bunch of galactic battles between the empire and rebels. Lightsabers and jet fights everywhere. The art in star wars world, starts with landscape of planets, then some spaceship that suspends in the space. Sounds of blasts can be heard\"\n        ],\n    \"metadatas\":\n        [\n            {\"tools\": \"FLUX\", \"type\": \"image\", \"kw\": \"this is a kw about butterfly\"},\n            {\"tools\": \"Pika\", \"type\": \"video\", \"kw\": \"This is a kw about postman\"}\n        ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -41,11 +51,21 @@
 		{
 			"name": "chroma retrieve",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "yttk7ypL9RIYz9zCxV0eR9KQVST3Wo2zKgUz2g",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"query\": \"star wars\",\n    \"k\" : 2,\n    \"minimum_score\" : 0\n}",
+					"raw": "{\n    \"query\": \"in time\",\n    \"metadata\": {\n        \"type\": \"image\",\n        \"tools\": \"FLUX\"\n    },\n    \"k\" : 4,\n    \"maximum_distance\" : 0.4\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -77,7 +97,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"query\": \"star wars\",\n    \"k\" : 2,\n    \"minimum_score\" : 0\n}",
+					"raw": "{\n    \"query\": \"vertical movie\",\n    \"k\" : 3\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -140,7 +160,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"content\": \"I want yee to generate mee a movie o' these\",\n    \"content_type\": \"media\",\n    \"url\": \"https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fyfwar6iws3pva01lwtsa.png\",\n    \"history\": [\n        {\n            \"HumanMessage\": \"Hi! My name is Amir! How are you?\"\n        },\n        {\n            \"AIMessage\": \"Nice to meet you Amir! I'm good. How can I help you?\"\n        },\n        {\n            \"HumanMessage\": \"I need you to speak and generate prompts like a pirate since this is the only way I can understand.\"\n        },\n        {\n            \"AIMessage\": \"Ahoy! sure I can matey!\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -148,7 +168,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://127.0.0.1:8585/receive-message",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -158,7 +178,7 @@
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-message"
 					]
 				}
 			},
@@ -171,7 +191,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"content\": \"I want yee to generate mee a video like Schindler's List. Arrr!\",\n    \"content_type\": \"media\",\n    \"history\": [\n        {\n            \"HumanMessage\": \"Hi! My name is Amir! How are you?\"\n        },\n        {\n            \"AIMessage\": \"Nice to meet you Amir! I'm good. How can I help you?\"\n        },\n        {\n            \"HumanMessage\": \"I need you to speak and generate prompts like a pirate since this is the only way I can understand.\"\n        },\n        {\n            \"AIMessage\": \"Ahoy! sure I can matey!\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -179,17 +199,16 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://host.docker.internal:8585/receive-message",
 					"protocol": "http",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"host",
+						"docker",
+						"internal"
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-message"
 					]
 				}
 			},
@@ -198,11 +217,21 @@
 		{
 			"name": "chroma insert-context (specific sample)",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "yttk7ypL9RIYz9zCxV0eR9KQVST3Wo2zKgUz2g",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"facts\":\n        [\n         \"A world in which time is the currency. The government seeks to grasp your time\",\n         \"A bunch of galactic battles between the empire and rebels. Lightsabers and jet fights everywhere\"\n        ],\n    \"metadatas\":\n        [\n            {\"tools\": \"something\", \"type\": \"image\", \"kw\": \"random\"},\n            {\"tools\": \"something else\", \"type\": \"music\", \"kw\": \"is this a keyword?\"}\n        ]\n}",
+					"raw": "{\n    \"facts\":\n        [\n         \"The movie jigoolooo is a comedy with sitcom theme. This movie is recorded vertically in 1080x1900 size. It is in a world where the sky is green\"\n        ],\n    \"metadatas\":\n        [\n            {\"tools\": \"Pika\", \"type\": \"video\", \"kw\": \"random\"}\n        ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -234,7 +263,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"content\": \"I want a prompt for creating a movie like jigoolooo \",\n    \"content_type\": \"video\",\n    \"history\": [\n        {\n            \"HumanMessage\": \"Hi! My name is Amir! How are you?\"\n        },\n        {\n            \"AIMessage\": \"Nice to meet you Amir! I'm good. How can I help you?\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -242,7 +271,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://127.0.0.1:8585/receive-message",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -252,7 +281,7 @@
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-message"
 					]
 				}
 			},
@@ -261,11 +290,21 @@
 		{
 			"name": "insert feedback",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "yttk7ypL9RIYz9zCxV0eR9KQVST3Wo2zKgUz2g",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"fact\" : \"Inception is created by Christopher nolan\",\n    \"metadata\" : {\n        \"tools\" : \"Pika\",\n        \"type\" : \"video\",\n        \"kw\" : \"random input\"\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -273,7 +312,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://127.0.0.1:8585/receive-feedback",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -283,7 +322,7 @@
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-feedback"
 					]
 				}
 			},
@@ -292,11 +331,21 @@
 		{
 			"name": "insert feedback Copy",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "yttk7ypL9RIYz9zCxV0eR9KQVST3Wo2zKgUz2g",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"fact\":\n         \"The movie jigoolooo is a comedy with sitcom theme. This movie is recorded vertically in 1080x1900 size. It is in a world where the sky is green\",\n    \"metadata\":\n            {\"tools\": \"Pika\", \"type\": \"video\", \"kw\": \"random\"}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -304,7 +353,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://127.0.0.1:8585/receive-feedback",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -314,7 +363,7 @@
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-feedback"
 					]
 				}
 			},
