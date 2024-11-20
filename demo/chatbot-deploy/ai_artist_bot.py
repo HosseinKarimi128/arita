@@ -112,7 +112,7 @@ class AIArtistBot:
             List of generated prompts
         """
         context = self.get_context(user_request, k, maximum_distance, metadata)
-
+        logger.info(f'==================================== > {context}')
         # Create chain
         chain = self.base_prompt | self.llm | self.parser
         
