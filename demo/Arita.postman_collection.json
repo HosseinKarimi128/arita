@@ -109,7 +109,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"content\": \"I want yee to generate mee one o' these!\",\n    \"content_type\": \"media\",\n    \"url\": \"https://lumiere-a.akamaihd.net/v1/images/darth-vader-main_4560aff7.jpeg?region=71%2C0%2C1139%2C854\",\n    \"history\": [\n        {\n            \"HumanMessage\": \"Hi! My name is Amir! How are you?\"\n        },\n        {\n            \"AIMessage\": \"Nice to meet you Amir! I'm good. How can I help you?\"\n        },\n        {\n            \"HumanMessage\": \"I need you to speak and generate prompts like a pirate since this is the only way I can understand.\"\n        },\n        {\n            \"AIMessage\": \"Ahoy! sure I can matey!\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -117,7 +117,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8585/receive",
+					"raw": "http://127.0.0.1:8585/receive-message",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -127,7 +127,7 @@
 					],
 					"port": "8585",
 					"path": [
-						"receive"
+						"receive-message"
 					]
 				}
 			},
@@ -260,6 +260,37 @@
 		},
 		{
 			"name": "insert feedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8585/receive",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8585",
+					"path": [
+						"receive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "insert feedback Copy",
 			"request": {
 				"method": "POST",
 				"header": [],
