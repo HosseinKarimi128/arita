@@ -9,6 +9,7 @@ services:
       - "8585:8585"
     volumes:
       - ./database:/app/temp_user_files
+      - .:/app
     env_file:
       - .env
     restart: unless-stopped

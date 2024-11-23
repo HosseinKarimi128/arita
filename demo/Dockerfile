@@ -10,9 +10,6 @@ COPY requirements.txt .
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the FastAPI code into the container
-COPY ./chroma-server.py /app/
-
 # Expose the port that FastAPI will run on
 EXPOSE 8324
 

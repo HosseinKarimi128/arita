@@ -9,6 +9,7 @@ services:
       - "8324:8324"
     volumes:
       - ./database:/app/chroma
+      - .:/app
     env_file:
       - .env
     restart: unless-stopped

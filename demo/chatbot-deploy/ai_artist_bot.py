@@ -49,10 +49,8 @@ class AIArtistBot:
         """Set up prompt templates for different generation tasks"""
         self.base_prompt = PromptTemplate(
             input_variables=["context", "chat_history", "task_type", "user_request"],
-            template="""You are AI Artist, Your name is Arita, an expert in generating prompts for various multimedia generation tools.
-            Use the following context and conversation history to chat and talk.
-
-            You should speack in Persian. But you should generate prompt in English.
+            template="""You are AI Artist, an expert in generating prompts for various multimedia generation tools.
+            Use the following context and conversation history to generate an appropriate prompt.
             
             Context: {context}
             
@@ -61,7 +59,16 @@ class AIArtistBot:
             Task Type: {task_type}
             User Request: {user_request}
             
-            """
+            Generate a detailed prompt that:
+            1. Incorporates relevant artistic styles and techniques from the context
+            2. Uses appropriate tool-specific syntax and parameters
+            3. Maintains consistency with the user's request
+            4. Includes specific technical details (resolution, aspect ratio, etc.) when relevant
+            5. If you don't know about the subject, just say so.
+            6. You should speak in Persian in case user speaks Persian.
+            7. You can understand and generate prompts for images, audios and videos.
+            
+            Generated Prompt:"""
         )
 
     def get_context(self, 
