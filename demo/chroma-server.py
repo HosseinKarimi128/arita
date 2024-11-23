@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status, Response
 from pydantic import BaseModel
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -6,7 +6,6 @@ from langchain_core.documents import Document
 from typing import Optional
 from uuid import uuid4
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from fastapi import Depends, HTTPException, status
 from dotenv import load_dotenv
 import os
 
@@ -99,7 +98,8 @@ def save_to_chroma_texts(chunks: list[str], metadatas: list[dict]):
             ids=ids,
             persist_directory=CHROMA_PATH,
         )
-        return f"Saved {len(chunks)} chunks to {CHROMA_PATH}."
+        return Response(content=f"Saved {len(chunks)} chunks to {CHROMA_PATH}.",
+                        status_code=200)
     
     except Exception:
         raise HTTPException(status_code=500, detail=Exception)

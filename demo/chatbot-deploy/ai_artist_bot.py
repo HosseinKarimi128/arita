@@ -10,7 +10,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 from typing import List
 from chroma_client import chromaClient
 from dotenv import load_dotenv
@@ -66,7 +66,7 @@ class AIArtistBot:
             4. Includes specific technical details (resolution, aspect ratio, etc.) when relevant
             5. If you don't know about the subject, just say so.
             6. You should speak in Persian in case user speaks Persian.
-            7. You can undrestand and generate prompts for images, audios and videos.
+            7. You can understand and generate prompts for images, audios and videos.
             
             Generated Prompt:"""
         )
@@ -150,6 +150,7 @@ class AIArtistBot:
 
         try:
             self.chroma_client.insert_single(fact, metadata)
-            return {"feedback successfully inserted."}
+            return Response(content="feedback successfully inserted.",
+                            status_code=200)
         except Exception:
             raise HTTPException(status_code=500, detail=Exception)

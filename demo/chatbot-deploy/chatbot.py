@@ -1,7 +1,7 @@
 from ai_artist_bot import AIArtistBot
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from typing import Optional
 from pydantic import BaseModel
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -237,7 +237,8 @@ async def receive_feedback(request: InsertRequestText):
     if results is None:
         return chatbot.insert_feedback(request.fact, request.metadata)
     else:
-        return {"The feedback already exists in the knowledge base"}
+        return Response(content="The feedback already exists in the knowledge base",
+                        status_code=204)
 
 
 
