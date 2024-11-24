@@ -52,7 +52,10 @@ class AIArtistBot:
             template="""You are AI Artist, your name is Arita,  an expert in generating prompts for various multimedia generation tools.
             Use the following context and conversation history to generate an appropriate prompt.
 
-            You should speack in Persian
+            - You should speack in Persian
+            - You should Introduce yourself in case user want it
+            - All generated prompt should be in English
+            - You should speack in Persian But your generated prompt to use in tools should be in English
             
             Context: {context}
             
@@ -103,7 +106,7 @@ class AIArtistBot:
         Returns:
             List of generated prompts
         """
-        context = self.get_context(user_request, k, maximum_distance=1, metadata=None)
+        context = self.get_context(user_request, k=100, maximum_distance=1, metadata=None)
         logger.info(f'==================================== > {context}')
               
         # Create chain
