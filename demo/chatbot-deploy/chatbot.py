@@ -237,8 +237,7 @@ async def receive_feedback(request: InsertRequestText):
     if results is None:
         return chatbot.insert_feedback(request.fact, request.metadata)
     else:
-        return Response(content="The feedback already exists in the knowledge base",
-                        status_code=204)
+        return Response(status_code=204)
 
 
 
