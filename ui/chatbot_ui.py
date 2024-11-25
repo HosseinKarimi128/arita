@@ -1,6 +1,7 @@
 import gradio as gr
+import urllib3
 import requests
-
+from rich import print as rprint
 API_BASE_URL = "http://188.121.119.22:8585"
 
 def chat_with_bot(message, history):
@@ -9,37 +10,47 @@ def chat_with_bot(message, history):
     """
     if history is None:
         history = []
-    try:
-        # Prepare the request payload
-        # Convert the Gradio history format to the API expected format
-        api_history = []
-        for user_msg, bot_msg in history:
-            api_history.append({'HumanMessage': user_msg})
-            api_history.append({'AIMessage': [bot_msg]})
-        # Add the latest user message
-        api_history.append({'HumanMessage': message})
+    # try:
+    # Prepare the request payload
+    # Convert the Gradio history format to the API expected format
+    api_history = []
+    for user_msg, bot_msg in history:
+        api_history.append({'HumanMessage': user_msg})
+        api_history.append({'AIMessage': [bot_msg]})
+    # Add the latest user message
+    api_history.append({'HumanMessage': message})
 
-        data = {
-            "content": message,
-            "content_type": "text",
-            "url": "",
-            "history": api_history
-        }
+    data = {
+        "content": message,
+        "content_type": "media",
+        "url": "",
+        "history": api_history
+    }
 
-        # Send the POST request to the /receive-message endpoint
-        response = requests.post(f"{API_BASE_URL}/receive-message", json=data)
-        response.raise_for_status()
+    headers = {
+        "Content-Type": "application/json",
+        "accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    }
+    session = requests.Session()
+    session.trust_env = False
+    # Send the POST request to the /receive-message endpoint
+    # response = urllib3.request(method='POST', url=f"{API_BASE_URL}/receive-message", json=data, headers=headers)
+    response = session.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
+    # rprint(f"This is the req response: {response.json()}")
+    # response.raise_for_status()
 
-        # Print the API response for debugging
-        json_response = response.json()[-1]
-        print("API Response:", json_response)
+    # Print the API response for debugging
+    json_response = response.json()[-1]
+    print("API Response:", json_response)
 
-        # Extract the bot's reply from the API response
-        bot_reply = json_response['AIMessage'][0] if 'AIMessage' in json_response else 'متاسفم، نتوانستم درخواست شما را پردازش کنم.'
+    # Extract the bot's reply from the API response
+    bot_reply = json_response['AIMessage'][0] if 'AIMessage' in json_response else 'متاسفم، نتوانستم درخواست شما را پردازش کنم.'
 
-    except Exception as e:
-        print("An error occurred in chat_with_bot:", e)
-        bot_reply = "متاسفم، نتوانستم درخواست شما را پردازش کنم."
+    # except Exception as e:
+    #     # print("An error occurred in chat_with_bot:", e)
+    #     raise e
+    #     bot_reply = "متاسفم، نتوانستم درخواست شما را پردازش کنم."
 
     # Update the conversation history
     history.append((message, bot_reply))
