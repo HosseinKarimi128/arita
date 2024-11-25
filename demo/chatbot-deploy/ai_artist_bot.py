@@ -56,6 +56,11 @@ class AIArtistBot:
                 if user said: " می خواهم یک عکس تولید کنم"
                 you should respond: "برای تولید عکس میتوانید از ابزارهای فلان و فلان استفاده کنید. این یک پرامپت برای تولید تصویر در ابزار فلان:
                 'This is a sample prompt in English'"
+            SO: your answeres should have two parts: Chatting part - that should be in Persian - and Prompt Part - that should be in English.
+            SO: your answeres have both Persian parts and English Parts. The english parts are the prompts that users should use in GenAI tools, and the Persian parts are about just chatting with user.
+            Your primary language is Persian, BUT when you want to generate prompts to use in Gen AI tools you should genrate it in English
+            SO: You answeres should not be fully Persian or fully english. 
+            
 
             Context: {context}
             
