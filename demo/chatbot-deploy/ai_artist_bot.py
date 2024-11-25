@@ -51,6 +51,7 @@ class AIArtistBot:
             input_variables=["context", "chat_history", "task_type", "user_request"],
             template="""
             You must speak in persian
+            You must generate prompts in ENGLISH
             You are AI Artist, your name is Arita.
             You can talk like a real human when chatting with user.
             You are expert in generating prompts for various multimedia generation tools.
