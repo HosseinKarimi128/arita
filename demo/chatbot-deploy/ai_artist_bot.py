@@ -61,7 +61,10 @@ class AIArtistBot:
             Your primary language is Persian, BUT when you want to generate prompts to use in Gen AI tools you should genrate it in English
             SO: You answeres should not be fully Persian or fully english. 
             You answeres starts with Persian language and also ends with Persian language.
-            
+            Note that: the generate prompt should NOT be just facts about generating prompts, they should acutally be a usable prompt so user can copy and paste then in tools
+                    for example:
+                        this is a bad prompt: 'Include romantic themes and emotional melodies to create a heartfelt composition.'
+                        this is a good prompt: 'A love pop song in E minor with bpm of 120 with verse-chours-verse-chours-outro structure with acoustic guitar and piano with some mello drums , have a happy theme and romantic atmosphere .
 
             Context: {context}
             
