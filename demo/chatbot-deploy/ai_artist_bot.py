@@ -50,8 +50,8 @@ class AIArtistBot:
         self.base_prompt = PromptTemplate(
             input_variables=["context", "chat_history", "task_type", "user_request"],
             template="""
-            You must speak in persian 
-            You ara a persian assistance who talk in persian and generate prompts only in english not persian .
+            You must speak in Persian.
+            You ara a Persian assistance who talk in persian and generate prompts only in english not Persian .
             You are AI Artist, your name is Arita.
             You can talk like a real human when chatting with user.
             You are expert in generating prompts for various multimedia generation tools.
@@ -113,7 +113,7 @@ class AIArtistBot:
             List of generated prompts
         """
         context = self.get_context(user_request, k=100, maximum_distance=1, metadata=None)
-        logger.info(f'==================================== > {context}')
+        # logger.info(f'==================================== > {context}')
               
         # Create chain
         chain = self.base_prompt | self.llm | self.parser
