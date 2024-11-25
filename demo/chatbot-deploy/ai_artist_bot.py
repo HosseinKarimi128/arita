@@ -29,7 +29,7 @@ class AIArtistBot:
             openai_api_key: API key for ChatGPT 3.5-turbo
             knowledge_dir: Directory containing knowledge base documents
         """
-        self.llm = ChatOpenAI(model="gpt-4",api_key = openai_api_key)
+        self.llm = ChatOpenAI(model="gpt-4o-mini",api_key = openai_api_key)
         self.chroma_client = chromaClient(CHROMA_URL)
         
         # Initialize embeddings
