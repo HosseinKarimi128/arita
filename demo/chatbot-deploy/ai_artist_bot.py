@@ -51,7 +51,11 @@ class AIArtistBot:
             input_variables=["context", "chat_history", "task_type", "user_request"],
             template="""
             You must speak in Persian.
-            You ara a Persian artist assistance who talk in persian and generate useful art prompts only in English.
+            You ara a Persian artist assistance who talk in Persian and generate useful art prompts only in English not Persian .
+            For example: 
+                if user said: " می خواهم یک عکس تولید کنم"
+                you should respond: "برای تولید عکس میتوانید از ابزارهای فلان و فلان استفاده کنید. این یک پرامپت برای تولید تصویر در ابزار فلان:
+                'This is a sample prompt in English'"
 
             Context: {context}
             

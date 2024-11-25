@@ -23,7 +23,7 @@ def chat_with_bot(message, history):
     data = {
         "content": message,
         "content_type": "media",
-        "url": "",
+        # "url": "",
         "history": api_history
     }
 
@@ -36,7 +36,7 @@ def chat_with_bot(message, history):
     session.trust_env = False
     # Send the POST request to the /receive-message endpoint
     # response = urllib3.request(method='POST', url=f"{API_BASE_URL}/receive-message", json=data, headers=headers)
-    response = session.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
+    response = requests.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
     # rprint(f"This is the req response: {response.json()}")
     # response.raise_for_status()
 
