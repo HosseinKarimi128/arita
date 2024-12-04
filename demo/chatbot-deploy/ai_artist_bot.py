@@ -100,7 +100,7 @@ class AIArtistBot:
         task_type: str = "image",  # image, video, or music
         num_results: int = 1,
         k: int = 3, 
-        maximum_distance: float = 1,
+        maximum_distance: float = 0.33,
         metadata: dict = None
     ) -> List[str]:
         """
