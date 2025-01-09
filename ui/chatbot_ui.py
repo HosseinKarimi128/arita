@@ -1,5 +1,10 @@
 import gradio as gr
 import requests
+import random
+import base64
+import requests
+from io import BytesIO
+from PIL import Image
 
 API_BASE_URL = "http://127.0.0.1:8585"
 
@@ -57,12 +62,78 @@ def send_feedback(fact, type_value, tools_value, kw_value):
 # ---------------------------
 # Placeholder Generate Functions
 # ---------------------------
-def generate_image(prompt, tool):
+def generate_image(
+    prompt,
+    tool,  # Not used here, but included for consistency
+    width=720,
+    height=1024,
+    num_steps=24,
+    guidance=3.5,
+    seed=None,
+    strength=1.0,
+    init_image=None  # base64 or path to an image
+):
     """
-    Example function for generating images.
-    Replace this with actual API call or logic.
+    Generate an image by calling an API endpoint that returns raw JPEG bytes.
+    The function returns a PIL Image, which Gradio can display directly 
+    via gr.Image(...).
     """
-    return "https://via.placeholder.com/512x512.png?text=Generated+Image"
+
+    # If no seed is provided, generate one randomly
+    if seed is None:
+        seed = random.randint(0, 9999999)
+
+    # Build the request payload
+    payload = {
+        "prompt": prompt,
+        "width": width,
+        "height": height,
+        "num_steps": num_steps,
+        "guidance": guidance,
+        "seed": seed,
+        "strength": strength
+    }
+
+    # If you have an init_image, either pass it as base64 directly
+    # or read from a file and encode it to base64
+    if init_image is not None:
+        # If `init_image` is a path:
+        # with open(init_image, "rb") as f:
+        #     init_image_b64 = base64.b64encode(f.read()).decode("utf-8")
+        #     payload["init_image"] = init_image_b64
+
+        # Otherwise, if it's already base64, just pass it in:
+        payload["init_image"] = init_image
+
+    try:
+        # POST request to the API. The server responds with streaming JPEG bytes.
+        # Use stream=True or not; often for larger images streaming is recommended.
+        response = requests.post(
+            "http://46.34.167.8:8088/generate",
+            json=payload,
+            stream=True
+        )
+        response.raise_for_status()
+
+        # Read the raw image bytes from the response.
+        image_bytes = response.content
+
+        # Convert bytes into a PIL image (which Gradio can display when returned).
+        image = Image.open(BytesIO(image_bytes))
+
+        # Return the PIL Image object
+        return image
+
+    except requests.exceptions.RequestException as e:
+        # Handle network/connection errors
+        print("Request error:", e)
+        # Return a placeholder image or raise the error
+        return "https://via.placeholder.com/512.png?text=Error"
+
+    except Exception as e:
+        # Handle unexpected content issues, etc.
+        print("Error generating image:", e)
+        return "https://via.placeholder.com/512.png?text=Unexpected+Error"
 
 def generate_music(prompt, tool):
     """
@@ -109,26 +180,22 @@ with gr.Blocks() as demo:
             clear_button.click(lambda: [], None, chatbot, queue=False)
 
         # Right Column: Tabs
-        with gr.Column(scale=2):
+        with gr.Column(scale=1):
             with gr.Tabs():
                 # ----- Tab 1: تصویر -----
                 with gr.Tab("تصویر"):
-                    gr.Markdown("## تولید تصویر")
-                    img_prompt = gr.Textbox(
-                        placeholder="پرامپت تصویر خود را وارد کنید...",
-                        label="پرامپت تصویر"
-                    )
-                    img_tool = gr.Dropdown(
-                        choices=['pixverse', 'midjourney', 'runway'],
+                    prompt_box = gr.Textbox(label="پرامپت تصویر")
+                    tool_dropdown = gr.Dropdown(
+                        choices=['flux', 'midjourney', 'Dall-E'],
                         label="ابزار تولید تصویر"
                     )
-                    generate_img_btn = gr.Button("تولید تصویر")
-                    output_img = gr.Image(label="خروجی تصویر")
+                    generate_button = gr.Button("تولید تصویر")
+                    output_image = gr.Image(label="خروجی تصویر")
 
-                    generate_img_btn.click(
+                    generate_button.click(
                         generate_image,
-                        inputs=[img_prompt, img_tool],
-                        outputs=output_img
+                        inputs=[prompt_box, tool_dropdown],
+                        outputs=output_image
                     )
 
                 # ----- Tab 2: موسیقی -----
@@ -159,7 +226,7 @@ with gr.Blocks() as demo:
                         label="پرامپت ویدیو"
                     )
                     video_tool = gr.Dropdown(
-                        choices=['runway', 'luma', 'flux'],
+                        choices=['runway', 'luma', 'pixverse'],
                         label="ابزار تولید ویدیو"
                     )
                     generate_video_btn = gr.Button("تولید ویدیو")
