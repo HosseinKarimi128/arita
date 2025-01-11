@@ -8,22 +8,54 @@ from PIL import Image
 
 API_BASE_URL = "http://127.0.0.1:8585"
 
-def chat_with_bot(message, history):
+def upload_image(file):
+    """
+    Uploads the image to a temporary file hosting service and returns the URL.
+    You can replace this function with your preferred image hosting service.
+    """
+    if file is None:
+        return None
+
+    try:
+        with open(file.name, "rb") as f:
+            files = {'file': f}
+            response = requests.post('https://tmpfiles.org/api/v1/upload', files=files)
+            response.raise_for_status()
+            # Replace 'tmpfiles.org/' with the appropriate URL structure if needed
+            return response.json()['data']['url'].replace('tmpfiles.org/', 'tmpfiles.org/dl/')
+    except Exception as e:
+        print("Error uploading image:", e)
+        return None
+
+def chat_with_bot(message, image, history):
     if history is None:
         history = []
+
+    # Handle image upload
+    image_url = None
+    if image is not None:
+        image_url = upload_image(image)
+        if image_url is None:
+            bot_reply = "متاسفم، نتوانستم تصویر شما را بارگذاری کنم."
+            history.append((message, bot_reply))
+            return history, ""
 
     # Convert Gradio history to the API format
     api_history = []
     for user_msg, bot_msg in history:
         api_history.append({'HumanMessage': user_msg})
         api_history.append({'AIMessage': [bot_msg]})
-    api_history.append({'HumanMessage': message})
-
+    
+    # Prepare the data payload
     data = {
         "content": message,
         "content_type": "media",
         "history": api_history
     }
+
+    # Include the image URL if available
+    if image_url:
+        data["url"] = image_url
 
     headers = {
         "Content-Type": "application/json",
@@ -31,14 +63,25 @@ def chat_with_bot(message, history):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
 
-    response = requests.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
-    json_response = response.json()[-1]
-    print("API Response:", json_response)
+    try:
+        response = requests.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
+        response.raise_for_status()
+        json_response = response.json()[-1]
+        print("API Response:", json_response)
 
-    bot_reply = json_response.get('AIMessage', ['متاسفم، نتوانستم درخواست شما را پردازش کنم.'])[0]
-    history.append((message, bot_reply))
+        bot_reply = json_response.get('AIMessage', ['متاسفم، نتوانستم درخواست شما را پردازش کنم.'])[0]
+        history.append((message, bot_reply))
+    except requests.exceptions.RequestException as e:
+        print("Request error:", e)
+        bot_reply = "خطا در ارتباط با سرور. لطفاً بعداً تلاش کنید."
+        history.append((message, bot_reply))
+    except Exception as e:
+        print("Unexpected error:", e)
+        bot_reply = "خطای غیرمنتظره رخ داده است."
+        history.append((message, bot_reply))
 
     return history, ""
+
 
 def send_feedback(fact, type_value, tools_value, kw_value):
     try:
@@ -162,24 +205,28 @@ with gr.Blocks() as demo:
             chatbot = gr.Chatbot(label="گفتگو با ربات", value=[])
             message = gr.Textbox(
                 placeholder="پیام خود را اینجا وارد کنید...", 
-                label="پیام شما"
+                label="پرامپت شما"
+            )
+            image_upload = gr.File(
+                label="آپلود تصویر", 
+                file_types=["image"]
             )
             send_button = gr.Button("ارسال")
             clear_button = gr.Button("پاک کردن گفتگو")
 
             send_button.click(
                 chat_with_bot,
-                inputs=[message, chatbot],
+                inputs=[message, image_upload, chatbot],
                 outputs=[chatbot, message]
             )
             message.submit(
                 chat_with_bot,
-                inputs=[message, chatbot],
+                inputs=[message, image_upload, chatbot],
                 outputs=[chatbot, message]
             )
             clear_button.click(lambda: [], None, chatbot, queue=False)
 
-        # Right Column: Tabs
+        # Right Column: Tabs (Remains unchanged)
         with gr.Column(scale=1):
             with gr.Tabs():
                 # ----- Tab 1: تصویر -----
