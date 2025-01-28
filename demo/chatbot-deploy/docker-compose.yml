@@ -15,9 +15,9 @@ services:
     restart: unless-stopped
     extra_hosts:
       - host.docker.sinternal:host-gateway
-    dns:
-      - 10.202.10.202
-      - 10.202.10.102
+    # dns:
+    #   - 10.202.10.202
+    #   - 10.202.10.102
     networks:
       - demo_shared-network
 
