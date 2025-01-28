@@ -29,7 +29,7 @@ class AIArtistBot:
             openai_api_key: API key for ChatGPT 3.5-turbo
             knowledge_dir: Directory containing knowledge base documents
         """
-        self.llm = ChatOpenAI(model="gpt-4o-mini",api_key = openai_api_key)
+        self.llm = ChatOpenAI(model="gpt-4o",api_key = openai_api_key)
         self.chroma_client = chromaClient(CHROMA_URL)
         
         # Initialize embeddings
@@ -50,26 +50,56 @@ class AIArtistBot:
         self.base_prompt = PromptTemplate(
             input_variables=["context", "chat_history", "task_type", "user_request"],
             template="""
-            You must speak in Persian.
-            You ara a Persian artist assistance who talk in Persian and generate useful art prompts only in English not Persian .
-            For example: 
-                if user said: " می خواهم یک عکس تولید کنم"
-                you should respond: "برای تولید عکس میتوانید از ابزارهای فلان و فلان استفاده کنید. این یک پرامپت برای تولید تصویر در ابزار فلان:
-                'This is a sample prompt in English' شما می توانید از این پرامپت برای استفاده در فلان ابزار استفاده کنید."
-            SO: your answeres should have two parts: Chatting part - that should be in Persian - and Prompt Part - that should be in English.
-            SO: your answeres have both Persian parts and English Parts. The english parts are the prompts that users should use in GenAI tools, and the Persian parts are about just chatting with user.
-            Your primary language is Persian, BUT when you want to generate prompts to use in Gen AI tools you should genrate it in English
-            SO: You answeres should not be fully Persian or fully english. 
-            You answeres starts with Persian language and also ends with Persian language.
-            Note that: the generate prompt should NOT be just facts about generating prompts, they should acutally be a usable prompt so user can copy and paste then in tools
-                    for example:
-                        this is a bad prompt: 'Include romantic themes and emotional melodies to create a heartfelt composition.'
-                        this is a good prompt: 'A love pop song in E minor with bpm of 120 with verse-chours-verse-chours-outro structure with acoustic guitar and piano with some mello drums , have a happy theme and romantic atmosphere .
+            Here is chat history: {chat_history}
 
-            Context: {context}
+            You must respond in Persian for general conversation and explanations, but generate art prompts only in English. Your task is to act as a Persian artist assistant who provides useful prompts for Gen AI tools while maintaining a bilingual format.
+
+            Instructions:
+            Persian Conversation: Begin and end your responses in Persian, ensuring you interact naturally in Persian for the conversational parts.
+            (JUST in the very first of conversation, you ask user the subject for the art prompt.)
+            (then wait for user to answer the subject.)
+             -- if you have already asked the subject, you must skip to the next step.
             
-            Chat History: {chat_history}
+            (users tell you what they want to create.)
+            (then you ask some exploratory questions.)
+            (then wait for user to answer the exploratory questions.)
+            exploratory questions:
+            exploratory_questions = [
+                "لطفا بفرمایید که چه سبک هنری مد نظر شماست؟ ",
+                "آیا موضوع خاصی وجود دارد که بخواهید در اثر هنری خود بگنجانید؟",
+                "چه احساسی می‌خواهید اثر هنری شما منتقل کند؟",
+                "آیا رنگ‌ها یا سبک‌های خاصی وجود دارند که ترجیح می‌دهید در اثر هنری شما استفاده شوند؟",
+                "آیا نمونه‌ای از آثار هنری وجود دارد که به آن علاقه‌مند باشید و بخواهید شبیه آن باشد؟"
+            ]
+
+            -- If you have already asked the exploratory questions, you must skip to the next step.
+
+            English Art Prompts:
+            When the user requests a prompt, you must provide a complete, usable, and detailed prompt in English for use in generative AI tools. Avoid vague or general guidance.
+
+            Different parts of conversation:
+                Persian Part (Chatting): Explain the context, tools, or general concepts in Persian.
+                English Part (Prompt): Provide a ready-to-use, detailed English prompt for the user to copy and paste into their chosen AI tool.
+        
+            (You must generat prompt considering following context:
             
+            {context})
+            
+            As you see in context, entry includes a tool.
+            So you must tell the user which tool they should use among the given tools for your provided prompt/
+            
+            Notes:
+            prompt should not start with `create ...`
+
+            Consistent Dual-Language Answers:
+                Always start and end in Persian.
+                Include English prompts only in the middle of your response.
+                Contextual Variables:
+
+            Response Format:
+            - prompt: ...
+            - tool: ...
+
             Task Type: {task_type}
             User Request: {user_request}
             """
@@ -81,15 +111,63 @@ class AIArtistBot:
                     maximum_distance: float,
                     metadata: dict=None):
 
-        # Retrieve relevant context
-        docs = self.chroma_client.retrieve(
-            query=user_request,
-            metadata=metadata,
-            k=k,
-            maximum_distance=maximum_distance
-        )
-        context = "No context available." if docs is None else "\n".join([doc[0]["page_content"] for doc in docs])
+        # # Retrieve relevant context
+        # docs = self.chroma_client.retrieve(
+        #     query=user_request,
+        #     metadata=metadata,
+        #     k=k,
+        #     maximum_distance=maximum_distance
+        # )
+        # context = "No context available." if docs is None else "\n".join([doc[0]["page_content"] for doc in docs])
+        context = {
+                    "image": {
+                        "Flux": {
+                            "category": "image",
+                            "tool": "Flux",
+                            "prompting_note": "Consider using simple and direct prompts for quick concept exploration. Focus on the main subject and overall style.  Detailed descriptions might not be as effective with this tool."
+                        },
+                        "Midjourney": {
+                            "category": "image",
+                            "tool": "Midjourney",
+                            "prompting_note": "Use artistic keywords, art styles (e.g., 'impressionism,' 'cyberpunk'), and aspect ratios (e.g., `--ar 16:9`). Explore the `/imagine` command and Midjourney's specific prompt modifiers for advanced control."
+                        },
+                        "Dall-E": {
+                            "category": "image",
+                            "tool": "Dall-E",
+                            "prompting_note": "Be very specific and descriptive. Include details like lighting, textures, camera angles, and composition. Dall-E understands complex prompts and can generate photorealistic outputs. Consider using editing features like inpainting and outpainting."
+                        }
+                    },
+                    "music": {
+                        "Suno": {
+                            "category": "music",
+                            "tool": "Suno",
+                            "prompting_note": "Focus on mood, genre, and instrumentation.  Short, concise prompts work well.  Think about the overall feeling or atmosphere you want to evoke."
+                        },
+                        "Loudly": {
+                            "category": "music",
+                            "tool": "Loudly",
+                            "prompting_note": "Provide details about tempo, key, instruments, and overall structure.  You can also specify the desired length and mood of the track.  More detailed prompts generally lead to better results."
+                        }
+                    },
+                    "video": {
+                        "Runway": {
+                            "category": "video",
+                            "tool": "Runway",
+                            "prompting_note": "Depending on the specific Runway tool you're using, tailor your prompt accordingly.  For style transfer, focus on the source and target styles. For video generation, describe the scene, characters, and desired effects."
+                        },
+                        "Luma": {
+                            "category": "video",
+                            "tool": "Luma",
+                            "prompting_note": "Provide detailed descriptions of the 3D environment, lighting, camera angles, and any animation you require.  Consider providing reference images or sketches for complex scenes."
+                        },
+                        "MinMax": {
+                            "category": "video",
+                            "tool": "MinMax",
+                            "prompting_note": "Focus on character design, animation style, and game genre.  Be specific about the desired actions and movements.  Reference images or existing game assets can be helpful."
+                        }
 
+                    }
+                }
         return context
         
     
