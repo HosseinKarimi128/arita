@@ -21,13 +21,12 @@ def upload_image(file):
             files = {'file': f}
             response = requests.post('https://tmpfiles.org/api/v1/upload', files=files)
             response.raise_for_status()
-            # Replace 'tmpfiles.org/' with the appropriate URL structure if needed
             return response.json()['data']['url'].replace('tmpfiles.org/', 'tmpfiles.org/dl/')
     except Exception as e:
         print("Error uploading image:", e)
         return None
 
-def chat_with_bot(message, image, history):
+def chat_with_bot(message, image, content_type, history):
     if history is None:
         history = []
 
@@ -49,7 +48,7 @@ def chat_with_bot(message, image, history):
     # Prepare the data payload
     data = {
         "content": message,
-        "content_type": "media",
+        "content_type": content_type,
         "history": api_history
     }
 
@@ -81,7 +80,6 @@ def chat_with_bot(message, image, history):
         history.append((message, bot_reply))
 
     return history, ""
-
 
 def send_feedback(fact, type_value, tools_value, kw_value):
     try:
@@ -140,17 +138,9 @@ def generate_image(
     # If you have an init_image, either pass it as base64 directly
     # or read from a file and encode it to base64
     if init_image is not None:
-        # If `init_image` is a path:
-        # with open(init_image, "rb") as f:
-        #     init_image_b64 = base64.b64encode(f.read()).decode("utf-8")
-        #     payload["init_image"] = init_image_b64
-
-        # Otherwise, if it's already base64, just pass it in:
         payload["init_image"] = init_image
 
     try:
-        # POST request to the API. The server responds with streaming JPEG bytes.
-        # Use stream=True or not; often for larger images streaming is recommended.
         response = requests.post(
             "http://46.34.167.8:8088/generate",
             json=payload,
@@ -158,42 +148,32 @@ def generate_image(
         )
         response.raise_for_status()
 
-        # Read the raw image bytes from the response.
         image_bytes = response.content
-
-        # Convert bytes into a PIL image (which Gradio can display when returned).
         image = Image.open(BytesIO(image_bytes))
 
-        # Return the PIL Image object
         return image
 
     except requests.exceptions.RequestException as e:
-        # Handle network/connection errors
         print("Request error:", e)
-        # Return a placeholder image or raise the error
         return "https://via.placeholder.com/512.png?text=Error"
 
     except Exception as e:
-        # Handle unexpected content issues, etc.
         print("Error generating image:", e)
         return "https://via.placeholder.com/512.png?text=Unexpected+Error"
 
 def generate_music(prompt, tool):
-    """
-    Example function for generating music.
-    Replace this with actual API call or logic.
-    """
     return "https://www.example.com/path-to-generated-music.mp3"
 
 def generate_video(prompt, tool):
-    """
-    Example function for generating video.
-    Replace this with actual API call or logic.
-    """
     return "https://www.example.com/path-to-generated-video.mp4"
 
+css = """
+.rtl-textbox{
+  text-align: right;
+}
+"""
 
-with gr.Blocks() as demo:
+with gr.Blocks(theme="soft", css=css) as demo:
     gr.Markdown("# آریتا")
 
     # ------------------------
@@ -207,6 +187,11 @@ with gr.Blocks() as demo:
                 placeholder="پیام خود را اینجا وارد کنید...", 
                 label="پرامپت شما"
             )
+            content_type_dropdown = gr.Dropdown(
+                choices=['media', 'scenario'], 
+                label="نوع محتوا",
+                value='media'
+            )
             image_upload = gr.File(
                 label="آپلود تصویر", 
                 file_types=["image"]
@@ -216,12 +201,12 @@ with gr.Blocks() as demo:
 
             send_button.click(
                 chat_with_bot,
-                inputs=[message, image_upload, chatbot],
+                inputs=[message, image_upload, content_type_dropdown, chatbot],
                 outputs=[chatbot, message]
             )
             message.submit(
                 chat_with_bot,
-                inputs=[message, image_upload, chatbot],
+                inputs=[message, image_upload, content_type_dropdown, chatbot],
                 outputs=[chatbot, message]
             )
             clear_button.click(lambda: [], None, chatbot, queue=False)
