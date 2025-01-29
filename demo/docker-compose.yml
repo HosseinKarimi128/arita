@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: chromadb:latest
+    image: chromadb/chroma:latest
     container_name: chroma-server
     ports:
       - "8324:8324"

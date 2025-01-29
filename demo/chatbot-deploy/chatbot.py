@@ -1,3 +1,11 @@
+import logging
+logger = logging.getLogger()
+fhandler = logging.FileHandler(filename='mylog.log', mode='a')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fhandler.setFormatter(formatter)
+logger.addHandler(fhandler)
+logger.setLevel(logging.DEBUG)
+
 from ai_artist_bot import AIArtistBot
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
@@ -258,7 +266,7 @@ async def receive_message(request: MessageRequest):
         print(request.url)
         description = describe_media(request.url)
         last_human_message = last_message_with_url(description, request.content)
-
+    logger.info(request.content_type.split('/')[-1])
     response = chatbot.generate_prompt(
         user_request=last_human_message,
         chat_history=formatted_history,
@@ -290,4 +298,4 @@ async def receive_feedback(request: InsertRequestText):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="localhost", port=8585)
+    uvicorn.run(app, host="localhost", port=8585, reload=True)

@@ -1,3 +1,11 @@
+import logging
+logger = logging.getLogger()
+fhandler = logging.FileHandler(filename='mylog.log', mode='a')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fhandler.setFormatter(formatter)
+logger.addHandler(fhandler)
+logger.setLevel(logging.DEBUG)
+
 import gradio as gr
 import requests
 import random
@@ -63,6 +71,7 @@ def chat_with_bot(message, image, content_type, history):
     }
 
     try:
+        logger.info(f'content type in gradio {content_type}')
         response = requests.post(f"{API_BASE_URL}/receive-message", json=data, headers=headers)
         response.raise_for_status()
         json_response = response.json()[-1]
@@ -106,12 +115,13 @@ def send_feedback(fact, type_value, tools_value, kw_value):
 def generate_image(
     prompt,
     tool,  # Not used here, but included for consistency
-    width=720,
+    width=1024,
     height=1024,
-    num_steps=24,
+    num_steps=20,
     guidance=3.5,
     seed=None,
     strength=1.0,
+    max_sequence_length=512,
     init_image=None  # base64 or path to an image
 ):
     """
@@ -129,10 +139,11 @@ def generate_image(
         "prompt": prompt,
         "width": width,
         "height": height,
-        "num_steps": num_steps,
-        "guidance": guidance,
+        "num_inference_steps": num_steps,
+        "guidance_scale": guidance,
         "seed": seed,
-        "strength": strength
+        "strength": strength,
+        "max_sequence_length": max_sequence_length,
     }
 
     # If you have an init_image, either pass it as base64 directly
@@ -142,7 +153,7 @@ def generate_image(
 
     try:
         response = requests.post(
-            "http://46.34.167.8:8088/generate",
+            "http://185.13.230.235:8000/generate",
             json=payload,
             stream=True
         )
@@ -180,38 +191,8 @@ with gr.Blocks(theme="soft", css=css) as demo:
     # Row containing Chatbot & Tabs
     # ------------------------
     with gr.Row():
-        # Left Column: Chatbot
-        with gr.Column(scale=3):
-            chatbot = gr.Chatbot(label="گفتگو با ربات", value=[])
-            message = gr.Textbox(
-                placeholder="پیام خود را اینجا وارد کنید...", 
-                label="پرامپت شما"
-            )
-            content_type_dropdown = gr.Dropdown(
-                choices=['media', 'scenario'], 
-                label="نوع محتوا",
-                value='media'
-            )
-            image_upload = gr.File(
-                label="آپلود تصویر", 
-                file_types=["image"]
-            )
-            send_button = gr.Button("ارسال")
-            clear_button = gr.Button("پاک کردن گفتگو")
-
-            send_button.click(
-                chat_with_bot,
-                inputs=[message, image_upload, content_type_dropdown, chatbot],
-                outputs=[chatbot, message]
-            )
-            message.submit(
-                chat_with_bot,
-                inputs=[message, image_upload, content_type_dropdown, chatbot],
-                outputs=[chatbot, message]
-            )
-            clear_button.click(lambda: [], None, chatbot, queue=False)
-
-        # Right Column: Tabs (Remains unchanged)
+    # Left Column: Chatbot
+        
         with gr.Column(scale=1):
             with gr.Tabs():
                 # ----- Tab 1: تصویر -----
@@ -269,7 +250,37 @@ with gr.Blocks(theme="soft", css=css) as demo:
                         inputs=[video_prompt, video_tool],
                         outputs=output_video
                     )
+            image_upload = gr.File(
+                label="آپلود تصویر", 
+                file_types=["image"], 
+            )
+        with gr.Column(scale=3):
+            chatbot = gr.Chatbot(label="گفتگو با ربات", value=[], height=600)  # Adjusted height
+            message = gr.Textbox(
+                placeholder="پیام خود را اینجا وارد کنید...", 
+                label="پرامپت شما"
+            )
+            content_type_dropdown = gr.Dropdown(
+                choices=['media', 'scenario'], 
+                label="نوع محتوا",
+                value='media'
+            )
 
+            send_button = gr.Button("ارسال")
+            clear_button = gr.Button("پاک کردن گفتگو")
+
+            send_button.click(
+                chat_with_bot,
+                inputs=[message, image_upload, content_type_dropdown, chatbot],
+                outputs=[chatbot, message]
+            )
+            message.submit(
+                chat_with_bot,
+                inputs=[message, image_upload, content_type_dropdown, chatbot],
+                outputs=[chatbot, message]
+            )
+            clear_button.click(lambda: [], None, chatbot, queue=False)
+        # Right Column: Tabs (Remains unchanged)
     # ---------------------------------
     # Feedback Section Under Everything
     # ---------------------------------
