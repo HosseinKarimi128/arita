@@ -1,5 +1,5 @@
 # Use the official chromadb image as a base
-FROM chromadb:latest
+FROM chromadb/chroma:latest 
 
 # Set the working directory in the container
 WORKDIR /app
